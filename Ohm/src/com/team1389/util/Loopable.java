@@ -1,5 +1,6 @@
 package com.team1389.util;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 public interface Loopable {
@@ -18,5 +19,20 @@ public interface Loopable {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static Loopable combine(Loopable... loopables) {
+		return new Loopable() {
+			@Override
+			public void init() {
+				Arrays.stream(loopables).forEach(l -> l.init());
+			}
+
+			@Override
+			public void update() {
+				Arrays.stream(loopables).forEach(l -> l.update());
+			}
+
+		};
 	}
 }
