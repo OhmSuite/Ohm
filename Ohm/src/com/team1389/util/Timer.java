@@ -32,7 +32,7 @@ public class Timer implements ScalarInput<Value> {
 	public void zero() {
 		timer.reset();
 		lastMark = 0;
-		last = edu.wpi.first.wpilibj.Timer.getFPGATimestamp();
+		last = timer.get();
 	}
 
 	/**

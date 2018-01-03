@@ -8,9 +8,10 @@ import com.team1389.command_framework.command_base.Command;
 import com.team1389.watch.CompositeWatchable;
 
 /**
- * a Subsystem stores a group of related tasks that can be run periodically when the SubSystem is
- * attached to a {@link SystemManager} in addition, subsystems must be watchable, and should offer
- * relevant information as subWatchables (see {@link CompositeWatchable})
+ * a Subsystem stores a group of related tasks that can be run periodically when
+ * the SubSystem is attached to a {@link SystemManager} in addition, subsystems
+ * must be watchable, and should offer relevant information as subWatchables
+ * (see {@link CompositeWatchable})
  * 
  * @author amind
  *
@@ -27,10 +28,10 @@ public abstract class Subsystem implements CompositeWatchable {
 	protected CommandScheduler scheduler;
 	// private Mode mode;
 
-	protected final void thisUpdate() {
+	protected void thisUpdate() {
 		/**
-		 * switch (mode) { case AUTONOMOUS: updateAutonomous(); break; case TELEOP: updateTeleop();
-		 * break; }
+		 * switch (mode) { case AUTONOMOUS: updateAutonomous(); break; case TELEOP:
+		 * updateTeleop(); break; }
 		 **/
 		update();
 		scheduler.update();
@@ -42,7 +43,8 @@ public abstract class Subsystem implements CompositeWatchable {
 	public abstract void init();
 
 	/**
-	 * called periodically while the system is attached to a ticking {@link SystemManager}
+	 * called periodically while the system is attached to a ticking
+	 * {@link SystemManager}
 	 */
 	public abstract void update();
 
