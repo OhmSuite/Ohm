@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="Ohm">
+    <property environment="env"/>
+    <property name="wpilib" value="../../../wpilib/java/current/lib/WPILib.jar"/>
+    <property name="networktables" value="../../../wpilib/java/current/lib/NetworkTables.jar"/>
+    <property name="opencv" value="../../../wpilib/java/current/lib/opencv.jar"/>
+    <property name="cscore" value="../../../wpilib/java/current/lib/cscore.jar"/>
+    <property name="BuildTest.location" value="../../../Desktop/RoboticsCurrent/BuildTest"/>
+    <property name="Quick-Template-Ohm.location" value="../../Quick-Template-Ohm/Quick-Template-Ohm"/>
+    <property name="Simulation-Ohm.location" value="../../Simulation-Ohm/Simulation-Ohm"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Ohm.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="${wpilib}"/>
+        <pathelement location="${networktables}"/>
+        <pathelement location="lib/navx_frc.jar"/>
+        <pathelement location="lib/TalonSRXLibJava.jar"/>
+        <pathelement location="${opencv}"/>
+        <pathelement location="${cscore}"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="Ohm.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${BuildTest.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${BuildTest.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Quick-Template-Ohm.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Quick-Template-Ohm.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${Simulation-Ohm.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Simulation-Ohm.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+</project>
