@@ -29,10 +29,12 @@ import com.team1389.watch.Watchable;
 public class CANTalonHardware extends Hardware<CAN> {
 	public static final int kTimeoutMs = 5000;
 	public static final int kMagicProfileSlotIdx = 0;
-	public static final int kMagicPIDLoopIdx = 0;
+	public static final int kMagicPIDLoopIdx = 1;
 	public static final int kDefaultPIDLoopIdx = 0;
+	public static final int kPositionPIDLoopIdx = 0;
 
 	private Optional<WPI_TalonSRX> wpiTalon;
+	private Consumer<WPI_TalonSRX> initialConfig;
 	private boolean outputInverted;
 	private boolean sensorPhase;
 	private FeedbackDevice selectedSensor;
@@ -53,12 +55,19 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 *      SRX user manual</a> for more information on output/input inversion
 	 */
 	public CANTalonHardware(boolean outInverted, boolean sensorPhase, FeedbackDevice selectedSensor, double sensorRange,
-			CAN requestedPort, Registry registry) {
+			CAN requestedPort, Registry registry, Consumer<WPI_TalonSRX> initialConfig) {
 		this.outputInverted = outInverted;
 		this.sensorPhase = sensorPhase;
 		this.selectedSensor = selectedSensor;
 		this.sensorRange = sensorRange;
+		this.initialConfig = initialConfig;
 		attachHardware(requestedPort, registry);
+	}
+
+	public CANTalonHardware(boolean outInverted, boolean sensorPhase, FeedbackDevice selectedSensor, double sensorRange,
+			CAN requestedPort, Registry registry) {
+		this(outInverted, sensorPhase, selectedSensor, sensorRange, requestedPort, registry, t -> {
+		});
 	}
 
 	/**
@@ -75,8 +84,14 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 *      "https://www.ctr-electronics.com/Talon%20SRX%20Software%20Reference%20Manual.pdf">Talon
 	 *      SRX user manual</a> for more information on output/input inversion
 	 */
+	public CANTalonHardware(boolean outInverted, CAN requestedPort, Registry registry,
+			Consumer<WPI_TalonSRX> initialConfig) {
+		this(outInverted, false, FeedbackDevice.None, 0, requestedPort, registry, initialConfig);
+	}
+
 	public CANTalonHardware(boolean outInverted, CAN requestedPort, Registry registry) {
-		this(outInverted, false, FeedbackDevice.None, 0, requestedPort, registry);
+		this(outInverted, requestedPort, registry, t -> {
+		});
 	}
 
 	@Override
@@ -95,6 +110,11 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.setSensorPhase(sensorPhase);
 		talon.configSelectedFeedbackSensor(selectedSensor, kDefaultPIDLoopIdx, kTimeoutMs);
 		talon.setInverted(outputInverted);
+		talon.configNominalOutputForward(0, kTimeoutMs);
+		talon.configNominalOutputReverse(0, kTimeoutMs);
+		talon.configPeakOutputForward(1, kTimeoutMs);
+		talon.configPeakOutputReverse(-1, kTimeoutMs);
+		initialConfig.accept(talon);
 		wpiTalon = Optional.of(talon);
 	}
 
@@ -139,6 +159,28 @@ public class CANTalonHardware extends Hardware<CAN> {
 			} else {
 				throw new RuntimeException(
 						"Error! attempted to use motion magic after control mode was changed, ensure you are only controlling the talon from one place!");
+			}
+		};
+		return new RangeOut<>(positionSetter, 0, sensorRange);
+	}
+
+	private static void configPositionControl(WPI_TalonSRX talon, PIDConstants pid) {
+		talon.configAllowableClosedloopError(0, kPositionPIDLoopIdx, kTimeoutMs); /* always servo */
+		/* set closed loop gains in slot0 */
+		talon.config_kF(kPositionPIDLoopIdx, pid.f, kTimeoutMs);
+		talon.config_kP(kPositionPIDLoopIdx, pid.p, kTimeoutMs);
+		talon.config_kI(kPositionPIDLoopIdx, pid.i, kTimeoutMs);
+		talon.config_kD(kPositionPIDLoopIdx, pid.d, kTimeoutMs);
+	}
+
+	public RangeOut<Position> getPositionController(PIDConstants pid) {
+		wpiTalon.ifPresent(t -> configPositionControl(t, pid));
+		Consumer<Double> positionSetter = d -> {
+			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Position).orElse(false)) {
+				wpiTalon.ifPresent(t -> t.set(ControlMode.Position, d));
+			} else {
+				throw new RuntimeException(
+						"Error! attempted to use position mode after control mode was changed, ensure you are only controlling the talon from one place!");
 			}
 		};
 		return new RangeOut<>(positionSetter, 0, sensorRange);
