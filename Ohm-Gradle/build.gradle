@@ -27,7 +27,7 @@ task libJar(type: Jar) {
 	}
 }
 artifacts{
-	archives libJar, name: 'ohm-core',type: 'jar', builtBy libJar
+	archives libJar, name: 'ohm-core',type: 'jar'
 }
 task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
