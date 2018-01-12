@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.team1389.configuration.PIDConstants;
 import com.team1389.hardware.Hardware;
+import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.outputs.software.RangeOut;
 import com.team1389.hardware.registry.Registry;
 import com.team1389.hardware.registry.port_types.CAN;
@@ -27,7 +28,7 @@ import com.team1389.watch.Watchable;
  *
  */
 public class CANTalonHardware extends Hardware<CAN> {
-	public static final int kTimeoutMs = 5000;
+	public static final int kTimeoutMs = 10;
 	public static final int kMagicProfileSlotIdx = 0;
 	public static final int kMagicPIDLoopIdx = 1;
 	public static final int kDefaultPIDLoopIdx = 0;
@@ -121,6 +122,12 @@ public class CANTalonHardware extends Hardware<CAN> {
 	@Override
 	public void failInit() {
 		wpiTalon = Optional.empty();
+	}
+
+	public RangeIn<Position> getSensorPositionStream() {
+		return new RangeIn<Position>(Position.class,
+				() -> wpiTalon.map(t -> (double) t.getSelectedSensorPosition(kDefaultPIDLoopIdx)).orElse(0.0), 0.0,
+				sensorRange);
 	}
 
 	// Configurations
