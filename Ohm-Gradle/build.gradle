@@ -1,0 +1,68 @@
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+    id "jaci.openrio.gradle.GradleRIO" version "2018.01.07"
+    id "java-library"
+    id "co.riiid.gradle" version "0.4.2"
+}
+ext{
+	releaseDir = 'release/'
+	libName = 'ohm'
+}
+
+// Defining my dependencies. In this case, WPILib (+ friends), CTRE Toolsuite (Talon SRX)
+// and NavX.
+dependencies {
+    implementation wpilib()
+    implementation ctre()
+    implementation navx()
+    implementation fileTree(dir: 'lib', include: '*.jar')
+}
+apply plugin: 'git-repo'
+version  = '0.1.1'
+task libJar(type: Jar) {
+	baseName = libName
+	manifest {
+		attributes('Implementation-Title' : libName,'Implementation-Version': project.version)
+	}
+}
+artifacts{
+	archives libJar
+}
+gitPublishConfig{
+	org = "amindell11"
+	repo = "ohm-release"
+}
+publishing {
+	publications{
+		maven(MavenPublication){
+			groupId 'com.team1389'
+			artifactId 'ohm'
+			version '1.0.0'
+			from components.java
+		}
+	}
+	repositories {
+		maven {
+			url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+		}
+	}
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4'
+}
+
+/*github {
+	owner = 'amindell11'
+	token = '6f4dbe023bfa5b4d47cb761c875872b02ca413c0'
+	repo = 'ohm-release'
+	tagName = project.version
+	targetCommitish = 'master'
+	name = 'v'+project.version
+	
+	assets = [
+		project.artifacts
+	]
+}*/
