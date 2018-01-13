@@ -206,7 +206,6 @@ public class CANTalonHardware extends Hardware<CAN> {
 		Consumer<Double> positionSetter = d -> {
 			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Position).orElse(false)) {
 				wpiTalon.ifPresent(t -> t.set(ControlMode.Position, d));
-				System.out.println(wpiTalon.map(t -> t.getClosedLoopError(kPositionPIDLoopIdx)));
 			} else {
 				throw new RuntimeException(
 						"Error! attempted to use position mode after control mode was changed, ensure you are only controlling the talon from one place!");
