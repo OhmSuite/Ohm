@@ -17,6 +17,7 @@ import com.team1389.hardware.registry.Registry;
 import com.team1389.hardware.registry.port_types.CAN;
 import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Speed;
+import com.team1389.hardware.value_types.Value;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
@@ -130,13 +131,18 @@ public class CANTalonHardware extends Hardware<CAN> {
 	}
 
 	public RangeIn<Position> getSensorPositionStream() {
-		return new RangeIn<Position>(Position.class,
+		return new RangeIn<>(Position.class,
 				() -> wpiTalon.map(t -> (double) t.getSelectedSensorPosition(kDefaultPIDLoopIdx)).orElse(0.0), 0.0,
 				sensorRange);
 	}
 
 	public PercentIn getVoltageTracker() {
 		return new PercentIn(() -> wpiTalon.map(t -> t.getMotorOutputVoltage()).orElse(0.0));
+	}
+
+	public RangeIn<Value> getClosedLoopErrorStream() {
+		return new RangeIn<>(Value.class, () -> wpiTalon.map(t -> (double) t.getClosedLoopError(0)).orElse(0.0), 0d,
+				sensorRange);
 	}
 
 	// Configurations
@@ -196,6 +202,7 @@ public class CANTalonHardware extends Hardware<CAN> {
 		Consumer<Double> positionSetter = d -> {
 			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Position).orElse(false)) {
 				wpiTalon.ifPresent(t -> t.set(ControlMode.Position, d));
+				System.out.println(wpiTalon.map(t -> t.getClosedLoopError(kPositionPIDLoopIdx)));
 			} else {
 				throw new RuntimeException(
 						"Error! attempted to use position mode after control mode was changed, ensure you are only controlling the talon from one place!");
@@ -209,7 +216,6 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.config_kP(kVelocityPIDLoopIdx, pid.p, kTimeoutMs);
 		talon.config_kI(kVelocityPIDLoopIdx, pid.i, kTimeoutMs);
 		talon.config_kD(kVelocityPIDLoopIdx, pid.d, kTimeoutMs);
-
 	}
 
 	/**
