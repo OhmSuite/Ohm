@@ -5,6 +5,7 @@ plugins {
     id "jaci.openrio.gradle.GradleRIO" version "2018.01.07"
     id "java-library"
     id "co.riiid.gradle" version "0.4.2"
+    id  "maven"
 }
 ext{
 	releaseDir = 'release/'
@@ -21,6 +22,7 @@ dependencies {
 }
 version  = '0.1.1'
 task libJar(type: Jar) {
+	classifier = 'lib'
 	baseName = libName
 	manifest {
 		attributes('Implementation-Title' : libName,'Implementation-Version': project.version)
@@ -32,7 +34,20 @@ artifacts{
 task wrapper(type: Wrapper) {
     gradleVersion = '4.4'
 }
-
+install {
+	repositories.mavenInstaller {
+		pom.project{
+			licenses{
+				license{
+					name 'The Apache Software License, Version 2.0'
+					url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					distribution 'repo'
+				}
+			}
+		}
+	}
+	
+}
 /*github {
 	owner = 'amindell11'
 	token = '6f4dbe023bfa5b4d47cb761c875872b02ca413c0'
