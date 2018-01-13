@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.team1389.configuration.PIDConstants;
 import com.team1389.hardware.Hardware;
+import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.outputs.software.PercentOut;
 import com.team1389.hardware.outputs.software.RangeOut;
@@ -134,6 +135,10 @@ public class CANTalonHardware extends Hardware<CAN> {
 				sensorRange);
 	}
 
+	public PercentIn getVoltageTracker() {
+		return new PercentIn(() -> wpiTalon.map(t -> t.getMotorOutputVoltage()).orElse(0.0));
+	}
+
 	// Configurations
 	/**
 	 * @param talon
@@ -198,37 +203,35 @@ public class CANTalonHardware extends Hardware<CAN> {
 		};
 		return new RangeOut<>(positionSetter, 0, sensorRange);
 	}
-	
+
 	private static void configVelocityControl(WPI_TalonSRX talon, PIDConstants pid) {
 		talon.config_kF(kVelocityPIDLoopIdx, pid.f, kTimeoutMs);
 		talon.config_kP(kVelocityPIDLoopIdx, pid.p, kTimeoutMs);
 		talon.config_kI(kVelocityPIDLoopIdx, pid.i, kTimeoutMs);
 		talon.config_kD(kVelocityPIDLoopIdx, pid.d, kTimeoutMs);
-		
+
 	}
-	
+
 	/**
 	 * takes velocity in native units of rot/sec
+	 * 
 	 * @param pid
 	 * @return
 	 */
 	public RangeOut<Speed> getVelocityController(PIDConstants pid) {
 		wpiTalon.ifPresent(t -> configVelocityControl(t, pid));
 		Consumer<Double> velocitySetter = d -> {
-			if(wpiTalon.map(t -> t.getControlMode() == ControlMode.Velocity).orElse(false)) {
+			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Velocity).orElse(false)) {
 				wpiTalon.ifPresent(t -> t.set(ControlMode.Velocity, d * 10));
-			} 
-			};
-			
+			}
+		};
+
 		return new RangeOut<Speed>(velocitySetter, 0, sensorRange);
-		}
-	
-	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid) {
-		
-		
 	}
-	
-	 
+
+	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid) {
+
+	}
 
 	private static void configVoltageMode(WPI_TalonSRX talon) {
 		talon.set(ControlMode.PercentOutput, 0);
