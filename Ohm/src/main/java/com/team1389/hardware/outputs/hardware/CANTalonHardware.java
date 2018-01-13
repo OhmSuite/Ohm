@@ -133,6 +133,10 @@ public class CANTalonHardware extends Hardware<CAN> {
 				() -> wpiTalon.map(t -> (double) t.getSelectedSensorPosition(kDefaultPIDLoopIdx)).orElse(0.0), 0.0,
 				sensorRange);
 	}
+	
+	public RangeIn<Speed> getVelocityStream() {
+		return new RangeIn<Speed>(Speed.class, () -> wpiTalon.map(t -> (double) t.getSelectedSensorVelocity(kDefaultPIDLoopIdx)).orElse(0.0), 0.0, sensorRange);
+	}
 
 	// Configurations
 	/**
