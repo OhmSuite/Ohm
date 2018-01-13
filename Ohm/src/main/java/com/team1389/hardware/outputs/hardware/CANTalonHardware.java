@@ -35,11 +35,10 @@ public class CANTalonHardware extends Hardware<CAN>
 {
 	public static final int kTimeoutMs = 10;
 	public static final int kMagicProfileSlotIdx = 0;
-	public static final int kMagicPIDLoopIdx = 1;
-	public static final int kDefaultPIDLoopIdx = 0;
-	public static final int kPositionPIDLoopIdx = 0;
-	public static final int kVelocityPIDLoopIdx = 2;
-	public static final int kMotionProfilePIDLoopIdx = 3;
+	
+	public static final int kCascadedPIDLoopIdx = 1;
+	public static final int kPrimaryPIDLoopIdx = 0;
+	public static final int kDefaultPIDLoopIdx = kPrimaryPIDLoopIdx;
 
 	private Optional<WPI_TalonSRX> wpiTalon;
 	private Consumer<WPI_TalonSRX> initialConfig;
@@ -160,9 +159,9 @@ public class CANTalonHardware extends Hardware<CAN>
 		return new PercentIn(() -> wpiTalon.map(t -> t.getMotorOutputVoltage()).orElse(0.0));
 	}
 
-	public RangeIn<Value> getClosedLoopErrorStream(int pidSlot)
+	public RangeIn<Value> getClosedLoopErrorStream()
 	{
-		return new RangeIn<>(Value.class, () -> wpiTalon.map(t -> (double) t.getClosedLoopError(pidSlot)).orElse(0.0),
+		return new RangeIn<>(Value.class, () -> wpiTalon.map(t -> (double) t.getClosedLoopError(kDefaultPIDLoopIdx)).orElse(0.0),
 				0d, sensorRange);
 	}
 
@@ -183,17 +182,17 @@ public class CANTalonHardware extends Hardware<CAN>
 		talon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, kTimeoutMs);
 		talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, kTimeoutMs);
 
-		talon.selectProfileSlot(kMagicProfileSlotIdx, kMagicPIDLoopIdx);
+		talon.selectProfileSlot(kMagicProfileSlotIdx, kPrimaryPIDLoopIdx);
 
-		talon.config_kF(kMagicPIDLoopIdx, pid.f, kTimeoutMs);
-		talon.config_kP(kMagicPIDLoopIdx, pid.p, kTimeoutMs);
-		talon.config_kI(kMagicPIDLoopIdx, pid.i, kTimeoutMs);
-		talon.config_kD(kMagicPIDLoopIdx, pid.d, kTimeoutMs);
+		talon.config_kF(kPrimaryPIDLoopIdx, pid.f, kTimeoutMs);
+		talon.config_kP(kPrimaryPIDLoopIdx, pid.p, kTimeoutMs);
+		talon.config_kI(kPrimaryPIDLoopIdx, pid.i, kTimeoutMs);
+		talon.config_kD(kPrimaryPIDLoopIdx, pid.d, kTimeoutMs);
 		/* set acceleration and vcruise velocity - see documentation */
 		talon.configMotionCruiseVelocity(vCruiseConv, kTimeoutMs);
 		talon.configMotionAcceleration(accConv, kTimeoutMs);
 		/* zero the sensor */
-		talon.set(ControlMode.MotionMagic, talon.getSelectedSensorPosition(kMagicPIDLoopIdx));
+		talon.set(ControlMode.MotionMagic, talon.getSelectedSensorPosition(kPrimaryPIDLoopIdx));
 	}
 
 	public RangeOut<Position> getMotionController(int vCruise, int acc, PIDConstants pid)
@@ -215,14 +214,14 @@ public class CANTalonHardware extends Hardware<CAN>
 
 	private static void configPositionControl(WPI_TalonSRX talon, PIDConstants pid)
 	{
-		talon.configAllowableClosedloopError(0, kPositionPIDLoopIdx,
+		talon.configAllowableClosedloopError(0, kPrimaryPIDLoopIdx,
 				kTimeoutMs); /* always servo */
 		/* set closed loop gains in slot0 */
-		talon.config_kF(kPositionPIDLoopIdx, pid.f, kTimeoutMs);
-		talon.config_kP(kPositionPIDLoopIdx, pid.p, kTimeoutMs);
-		talon.config_kI(kPositionPIDLoopIdx, pid.i, kTimeoutMs);
-		talon.config_kD(kPositionPIDLoopIdx, pid.d, kTimeoutMs);
-		talon.set(ControlMode.Position, talon.getSelectedSensorPosition(kPositionPIDLoopIdx));
+		talon.config_kF(kPrimaryPIDLoopIdx, pid.f, kTimeoutMs);
+		talon.config_kP(kPrimaryPIDLoopIdx, pid.p, kTimeoutMs);
+		talon.config_kI(kPrimaryPIDLoopIdx, pid.i, kTimeoutMs);
+		talon.config_kD(kPrimaryPIDLoopIdx, pid.d, kTimeoutMs);
+		talon.set(ControlMode.Position, talon.getSelectedSensorPosition(kPrimaryPIDLoopIdx));
 	}
 
 	public RangeOut<Position> getPositionController(PIDConstants pid)
@@ -244,10 +243,10 @@ public class CANTalonHardware extends Hardware<CAN>
 
 	private static void configVelocityControl(WPI_TalonSRX talon, PIDConstants pid)
 	{
-		talon.config_kF(kVelocityPIDLoopIdx, pid.f, kTimeoutMs);
-		talon.config_kP(kVelocityPIDLoopIdx, pid.p, kTimeoutMs);
-		talon.config_kI(kVelocityPIDLoopIdx, pid.i, kTimeoutMs);
-		talon.config_kD(kVelocityPIDLoopIdx, pid.d, kTimeoutMs);
+		talon.config_kF(kPrimaryPIDLoopIdx, pid.f, kTimeoutMs);
+		talon.config_kP(kPrimaryPIDLoopIdx, pid.p, kTimeoutMs);
+		talon.config_kI(kPrimaryPIDLoopIdx, pid.i, kTimeoutMs);
+		talon.config_kD(kPrimaryPIDLoopIdx, pid.d, kTimeoutMs);
 	}
 
 	/**
@@ -268,11 +267,6 @@ public class CANTalonHardware extends Hardware<CAN>
 		};
 
 		return new RangeOut<Speed>(velocitySetter, 0, sensorRange);
-	}
-
-	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid)
-	{
-
 	}
 
 	private static void configVoltageMode(WPI_TalonSRX talon)
