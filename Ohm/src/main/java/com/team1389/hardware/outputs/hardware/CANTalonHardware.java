@@ -31,7 +31,8 @@ import com.team1389.watch.Watchable;
  * @author amind
  *
  */
-public class CANTalonHardware extends Hardware<CAN> {
+public class CANTalonHardware extends Hardware<CAN>
+{
 	public static final int kTimeoutMs = 10;
 	public static final int kMagicProfileSlotIdx = 0;
 	public static final int kMagicPIDLoopIdx = 1;
@@ -49,8 +50,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 
 	/**
 	 * @param outInverted
-	 *            whether the motor output should be inverted (used for both voltage
-	 *            and position control modes)
+	 *            whether the motor output should be inverted (used for both
+	 *            voltage and position control modes)
 	 * @param inpInverted
 	 *            whether the sensor input should be inverted
 	 * @param requestedPort
@@ -62,7 +63,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 *      SRX user manual</a> for more information on output/input inversion
 	 */
 	public CANTalonHardware(boolean outInverted, boolean sensorPhase, FeedbackDevice selectedSensor, double sensorRange,
-			CAN requestedPort, Registry registry, Consumer<WPI_TalonSRX> initialConfig) {
+			CAN requestedPort, Registry registry, Consumer<WPI_TalonSRX> initialConfig)
+	{
 		this.outputInverted = outInverted;
 		this.sensorPhase = sensorPhase;
 		this.selectedSensor = selectedSensor;
@@ -72,8 +74,10 @@ public class CANTalonHardware extends Hardware<CAN> {
 	}
 
 	public CANTalonHardware(boolean outInverted, boolean sensorPhase, FeedbackDevice selectedSensor, double sensorRange,
-			CAN requestedPort, Registry registry) {
-		this(outInverted, sensorPhase, selectedSensor, sensorRange, requestedPort, registry, t -> {
+			CAN requestedPort, Registry registry)
+	{
+		this(outInverted, sensorPhase, selectedSensor, sensorRange, requestedPort, registry, t ->
+		{
 		});
 	}
 
@@ -81,8 +85,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 * assumes input is not inverted
 	 * 
 	 * @param outInverted
-	 *            whether the motor output should be inverted (used for both voltage
-	 *            and position control modes)
+	 *            whether the motor output should be inverted (used for both
+	 *            voltage and position control modes)
 	 * @param requestedPort
 	 *            the port to attempt to initialize this hardware
 	 * @param registry
@@ -92,27 +96,33 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 *      SRX user manual</a> for more information on output/input inversion
 	 */
 	public CANTalonHardware(boolean outInverted, CAN requestedPort, Registry registry,
-			Consumer<WPI_TalonSRX> initialConfig) {
+			Consumer<WPI_TalonSRX> initialConfig)
+	{
 		this(outInverted, false, FeedbackDevice.None, 0, requestedPort, registry, initialConfig);
 	}
 
-	public CANTalonHardware(boolean outInverted, CAN requestedPort, Registry registry) {
-		this(outInverted, requestedPort, registry, t -> {
+	public CANTalonHardware(boolean outInverted, CAN requestedPort, Registry registry)
+	{
+		this(outInverted, requestedPort, registry, t ->
+		{
 		});
 	}
 
 	@Override
-	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem) {
+	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem)
+	{
 		return stem;
 	}
 
 	@Override
-	protected String getHardwareIdentifier() {
+	protected String getHardwareIdentifier()
+	{
 		return "Talon";
 	}
 
 	@Override
-	public void init(CAN port) {
+	public void init(CAN port)
+	{
 		WPI_TalonSRX talon = new WPI_TalonSRX(port.index());
 		talon.setSensorPhase(sensorPhase);
 		talon.configSelectedFeedbackSensor(selectedSensor, kDefaultPIDLoopIdx, kTimeoutMs);
@@ -126,27 +136,34 @@ public class CANTalonHardware extends Hardware<CAN> {
 	}
 
 	@Override
-	public void failInit() {
+	public void failInit()
+	{
 		wpiTalon = Optional.empty();
 	}
 
-	public RangeIn<Position> getSensorPositionStream() {
+	public RangeIn<Position> getSensorPositionStream()
+	{
 		return new RangeIn<>(Position.class,
 				() -> wpiTalon.map(t -> (double) t.getSelectedSensorPosition(kDefaultPIDLoopIdx)).orElse(0.0), 0.0,
 				sensorRange);
 	}
-	
-	public RangeIn<Speed> getVelocityStream() {
-		return new RangeIn<Speed>(Speed.class, () -> wpiTalon.map(t -> (double) t.getSelectedSensorVelocity(kDefaultPIDLoopIdx)).orElse(0.0), 0.0, sensorRange);
+
+	public RangeIn<Speed> getVelocityStream()
+	{
+		return new RangeIn<Speed>(Speed.class,
+				() -> wpiTalon.map(t -> (double) t.getSelectedSensorVelocity(kDefaultPIDLoopIdx)).orElse(0.0), 0.0,
+				sensorRange);
 	}
 
-	public PercentIn getVoltageTracker() {
+	public PercentIn getVoltageTracker()
+	{
 		return new PercentIn(() -> wpiTalon.map(t -> t.getMotorOutputVoltage()).orElse(0.0));
 	}
 
-	public RangeIn<Value> getClosedLoopErrorStream() {
-		return new RangeIn<>(Value.class, () -> wpiTalon.map(t -> (double) t.getClosedLoopError(0)).orElse(0.0), 0d,
-				sensorRange);
+	public RangeIn<Value> getClosedLoopErrorStream(int pidSlot)
+	{
+		return new RangeIn<>(Value.class, () -> wpiTalon.map(t -> (double) t.getClosedLoopError(pidSlot)).orElse(0.0),
+				0d, sensorRange);
 	}
 
 	// Configurations
@@ -159,7 +176,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 *            max velocity in sensor units/sec^2
 	 * @param pid
 	 */
-	private static void configMotionMagic(WPI_TalonSRX talon, int vCruise, int acc, PIDConstants pid) {
+	private static void configMotionMagic(WPI_TalonSRX talon, int vCruise, int acc, PIDConstants pid)
+	{
 		int vCruiseConv = vCruise / 10;
 		int accConv = acc / 10;
 		talon.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 10, kTimeoutMs);
@@ -178,12 +196,16 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.set(ControlMode.MotionMagic, talon.getSelectedSensorPosition(kMagicPIDLoopIdx));
 	}
 
-	public RangeOut<Position> getMotionController(int vCruise, int acc, PIDConstants pid) {
+	public RangeOut<Position> getMotionController(int vCruise, int acc, PIDConstants pid)
+	{
 		wpiTalon.ifPresent(t -> configMotionMagic(t, vCruise, acc, pid));
-		Consumer<Double> positionSetter = d -> {
-			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.MotionMagic).orElse(false)) {
+		Consumer<Double> positionSetter = d ->
+		{
+			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.MotionMagic).orElse(false))
+			{
 				wpiTalon.ifPresent(t -> t.set(ControlMode.MotionMagic, d));
-			} else {
+			} else
+			{
 				throw new RuntimeException(
 						"Error! attempted to use motion magic after control mode was changed, ensure you are only controlling the talon from one place!");
 			}
@@ -191,8 +213,10 @@ public class CANTalonHardware extends Hardware<CAN> {
 		return new RangeOut<>(positionSetter, 0, sensorRange);
 	}
 
-	private static void configPositionControl(WPI_TalonSRX talon, PIDConstants pid) {
-		talon.configAllowableClosedloopError(0, kPositionPIDLoopIdx, kTimeoutMs); /* always servo */
+	private static void configPositionControl(WPI_TalonSRX talon, PIDConstants pid)
+	{
+		talon.configAllowableClosedloopError(0, kPositionPIDLoopIdx,
+				kTimeoutMs); /* always servo */
 		/* set closed loop gains in slot0 */
 		talon.config_kF(kPositionPIDLoopIdx, pid.f, kTimeoutMs);
 		talon.config_kP(kPositionPIDLoopIdx, pid.p, kTimeoutMs);
@@ -201,12 +225,16 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.set(ControlMode.Position, talon.getSelectedSensorPosition(kPositionPIDLoopIdx));
 	}
 
-	public RangeOut<Position> getPositionController(PIDConstants pid) {
+	public RangeOut<Position> getPositionController(PIDConstants pid)
+	{
 		wpiTalon.ifPresent(t -> configPositionControl(t, pid));
-		Consumer<Double> positionSetter = d -> {
-			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Position).orElse(false)) {
+		Consumer<Double> positionSetter = d ->
+		{
+			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Position).orElse(false))
+			{
 				wpiTalon.ifPresent(t -> t.set(ControlMode.Position, d));
-			} else {
+			} else
+			{
 				throw new RuntimeException(
 						"Error! attempted to use position mode after control mode was changed, ensure you are only controlling the talon from one place!");
 			}
@@ -214,7 +242,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 		return new RangeOut<>(positionSetter, 0, sensorRange);
 	}
 
-	private static void configVelocityControl(WPI_TalonSRX talon, PIDConstants pid) {
+	private static void configVelocityControl(WPI_TalonSRX talon, PIDConstants pid)
+	{
 		talon.config_kF(kVelocityPIDLoopIdx, pid.f, kTimeoutMs);
 		talon.config_kP(kVelocityPIDLoopIdx, pid.p, kTimeoutMs);
 		talon.config_kI(kVelocityPIDLoopIdx, pid.i, kTimeoutMs);
@@ -227,10 +256,13 @@ public class CANTalonHardware extends Hardware<CAN> {
 	 * @param pid
 	 * @return
 	 */
-	public RangeOut<Speed> getVelocityController(PIDConstants pid) {
+	public RangeOut<Speed> getVelocityController(PIDConstants pid)
+	{
 		wpiTalon.ifPresent(t -> configVelocityControl(t, pid));
-		Consumer<Double> velocitySetter = d -> {
-			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Velocity).orElse(false)) {
+		Consumer<Double> velocitySetter = d ->
+		{
+			if (wpiTalon.map(t -> t.getControlMode() == ControlMode.Velocity).orElse(false))
+			{
 				wpiTalon.ifPresent(t -> t.set(ControlMode.Velocity, d * 10));
 			}
 		};
@@ -238,20 +270,26 @@ public class CANTalonHardware extends Hardware<CAN> {
 		return new RangeOut<Speed>(velocitySetter, 0, sensorRange);
 	}
 
-	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid) {
+	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid)
+	{
 
 	}
 
-	private static void configVoltageMode(WPI_TalonSRX talon) {
+	private static void configVoltageMode(WPI_TalonSRX talon)
+	{
 		talon.set(ControlMode.PercentOutput, 0);
 	}
 
-	public PercentOut getVoltageController() {
+	public PercentOut getVoltageController()
+	{
 		wpiTalon.ifPresent(CANTalonHardware::configVoltageMode);
-		return new PercentOut(d -> wpiTalon.ifPresent(t -> {
-			if (t.getControlMode() == ControlMode.PercentOutput) {
+		return new PercentOut(d -> wpiTalon.ifPresent(t ->
+		{
+			if (t.getControlMode() == ControlMode.PercentOutput)
+			{
 				t.set(ControlMode.PercentOutput, d);
-			} else {
+			} else
+			{
 				throw new RuntimeException(
 						"Error! attempted to use voltage mode after control mode was changed, ensure you are only controlling the talon from one place!");
 			}
