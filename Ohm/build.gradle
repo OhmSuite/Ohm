@@ -47,7 +47,7 @@ install {
 }
 github {
 	owner = 'ohmSuite'
-	token = '3435537e2b039f7aa395045e0197e8055814dab7'
+	token = '82ccb967ceb588af6ade5bd815e97ed0c8c80c36'
 	repo = 'ohm'
 	tagName = project.version
 	targetCommitish = 'master'
