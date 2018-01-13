@@ -7,7 +7,7 @@ plugins {
     id "co.riiid.gradle" version "0.4.2"
     id  "maven"
 }
-version  = '0.1.1'
+version  = '0.1.0'
 
 ext{
 	libName = 'ohm'
