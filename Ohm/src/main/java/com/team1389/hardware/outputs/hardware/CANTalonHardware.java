@@ -14,6 +14,7 @@ import com.team1389.hardware.outputs.software.RangeOut;
 import com.team1389.hardware.registry.Registry;
 import com.team1389.hardware.registry.port_types.CAN;
 import com.team1389.hardware.value_types.Position;
+import com.team1389.hardware.value_types.Speed;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
@@ -33,6 +34,8 @@ public class CANTalonHardware extends Hardware<CAN> {
 	public static final int kMagicPIDLoopIdx = 1;
 	public static final int kDefaultPIDLoopIdx = 0;
 	public static final int kPositionPIDLoopIdx = 0;
+	public static final int kVelocityPIDLoopIdx = 2;
+	public static final int kMotionProfilePIDLoopIdx = 3;
 
 	private Optional<WPI_TalonSRX> wpiTalon;
 	private Consumer<WPI_TalonSRX> initialConfig;
@@ -192,4 +195,35 @@ public class CANTalonHardware extends Hardware<CAN> {
 		};
 		return new RangeOut<>(positionSetter, 0, sensorRange);
 	}
+	
+	private static void configVelocityControl(WPI_TalonSRX talon, PIDConstants pid) {
+		talon.config_kF(kVelocityPIDLoopIdx, pid.f, kTimeoutMs);
+		talon.config_kP(kVelocityPIDLoopIdx, pid.p, kTimeoutMs);
+		talon.config_kI(kVelocityPIDLoopIdx, pid.i, kTimeoutMs);
+		talon.config_kD(kVelocityPIDLoopIdx, pid.d, kTimeoutMs);
+		
+	}
+	
+	/**
+	 * takes velocity in native units of rot/sec
+	 * @param pid
+	 * @return
+	 */
+	public RangeOut<Speed> getVelocityController(PIDConstants pid) {
+		wpiTalon.ifPresent(t -> configVelocityControl(t, pid));
+		Consumer<Double> velocitySetter = d -> {
+			if(wpiTalon.map(t -> t.getControlMode() == ControlMode.Velocity).orElse(false)) {
+				wpiTalon.ifPresent(t -> t.set(ControlMode.Velocity, d * 10));
+			} 
+			};
+			
+		return new RangeOut<Speed>(velocitySetter, 0, sensorRange);
+		}
+	
+	private static void configMotionProfileControl(WPI_TalonSRX talon, PIDConstants pid) {
+		
+		
+	}
+	
+	 
 }
