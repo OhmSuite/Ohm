@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.team1389.configuration.PIDConstants;
 import com.team1389.hardware.Hardware;
 import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.outputs.software.PercentOut;
 import com.team1389.hardware.outputs.software.RangeOut;
 import com.team1389.hardware.registry.Registry;
 import com.team1389.hardware.registry.port_types.CAN;
@@ -156,6 +157,7 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.configMotionCruiseVelocity(vCruiseConv, kTimeoutMs);
 		talon.configMotionAcceleration(accConv, kTimeoutMs);
 		/* zero the sensor */
+		talon.set(ControlMode.MotionMagic, talon.getSelectedSensorPosition(kMagicPIDLoopIdx));
 	}
 
 	public RangeOut<Position> getMotionController(int vCruise, int acc, PIDConstants pid) {
@@ -178,6 +180,7 @@ public class CANTalonHardware extends Hardware<CAN> {
 		talon.config_kP(kPositionPIDLoopIdx, pid.p, kTimeoutMs);
 		talon.config_kI(kPositionPIDLoopIdx, pid.i, kTimeoutMs);
 		talon.config_kD(kPositionPIDLoopIdx, pid.d, kTimeoutMs);
+		talon.set(ControlMode.Position, talon.getSelectedSensorPosition(kPositionPIDLoopIdx));
 	}
 
 	public RangeOut<Position> getPositionController(PIDConstants pid) {
@@ -191,5 +194,21 @@ public class CANTalonHardware extends Hardware<CAN> {
 			}
 		};
 		return new RangeOut<>(positionSetter, 0, sensorRange);
+	}
+
+	private static void configVoltageMode(WPI_TalonSRX talon) {
+		talon.set(ControlMode.PercentOutput, 0);
+	}
+
+	public PercentOut getVoltageController() {
+		wpiTalon.ifPresent(CANTalonHardware::configVoltageMode);
+		return new PercentOut(d -> wpiTalon.ifPresent(t -> {
+			if (t.getControlMode() == ControlMode.PercentOutput) {
+				t.set(ControlMode.PercentOutput, d);
+			} else {
+				throw new RuntimeException(
+						"Error! attempted to use voltage mode after control mode was changed, ensure you are only controlling the talon from one place!");
+			}
+		}));
 	}
 }
