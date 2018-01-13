@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="Ohm.makejar" default="makejar" basedir=".">
-	<property file="build.properties" />
-	<target name ="makejar" description="Create a jar for the Ohm project">
-		<jar jarfile="${releaseLoc}/com.team1389.ohm-${version}.jar" includes="*.class" basedir="bin"/>
-	</target>
-</project>
