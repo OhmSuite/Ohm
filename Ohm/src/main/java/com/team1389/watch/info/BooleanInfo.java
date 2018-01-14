@@ -2,7 +2,7 @@ package com.team1389.watch.info;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * an info type that tracks the value of a boolean
@@ -22,8 +22,8 @@ public class BooleanInfo extends NamedSimpleWatchable {
 	}
 
 	@Override
-	public void publishUnderName(String name, ITable subtable) {
-		subtable.putBoolean(name, in.getAsBoolean());
+	public void publishUnderName(String name, NetworkTable subtable) {
+		subtable.getEntry(name).setBoolean(in.getAsBoolean());
 	}
 
 	@Override

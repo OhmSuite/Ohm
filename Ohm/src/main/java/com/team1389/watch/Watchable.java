@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.team1389.watch.info.SimpleWatchable;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * represents a value or set of values that can be displayed in a variety of
@@ -29,7 +29,7 @@ public interface Watchable {
 	 * @param table
 	 *            where key+value is published to
 	 */
-	void publishUnderName(String name, ITable table);
+	void publishUnderName(String name, NetworkTable table);
 
 	/**
 	 * returns a flat hashmap of simple watchables with hierarchical naming
@@ -48,7 +48,7 @@ public interface Watchable {
 	 * @param table
 	 *            where key+value is published to
 	 */
-	public default void publish(String parent, ITable table) {
+	public default void publish(String parent, NetworkTable table) {
 		publishUnderName(getFullName(parent), table);
 	}
 
@@ -59,7 +59,7 @@ public interface Watchable {
 	 *            where key+value is published to
 	 * 
 	 */
-	public default void publish(ITable table) {
+	public default void publish(NetworkTable table) {
 		publishUnderName(getName(), table);
 	}
 

@@ -2,7 +2,9 @@ package com.team1389.watch.input.listener;
 
 import java.util.function.Consumer;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
+
+
 
 /**
  * an input type that tracks the value of a boolean on a network table
@@ -21,13 +23,13 @@ public class BooleanInput extends InputWatchable<Boolean> {
 	}
 
 	@Override
-	protected void put(ITable table, String name, Boolean val) {
-		table.putBoolean(name, val);
+	protected void put(NetworkTable table, String name, Boolean val) {
+		table.getEntry(name).setBoolean(val);
 	}
 
 	@Override
-	protected Boolean get(ITable table, String name, Boolean defaultVal) {
-		return table.getBoolean(name, defaultVal);
+	protected Boolean get(NetworkTable table, String name, Boolean defaultVal) {
+		return table.getEntry(name).getBoolean(defaultVal);
 	}
 
 	@Override

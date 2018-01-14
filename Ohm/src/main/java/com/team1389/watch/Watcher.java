@@ -14,8 +14,9 @@ import java.util.stream.Collectors;
 import com.team1389.util.Loopable;
 import com.team1389.watch.info.SimpleWatchable;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 /**
  * stores a set of watchables, can display them in a variety of different ways
@@ -30,7 +31,7 @@ public class Watcher {
 	/**
 	 * The default NetworkTable to publish to (The SmartDashboard table)
 	 */
-	public static ITable DASHBOARD = NetworkTable.getTable("SmartDashboard");
+	public static NetworkTable DASHBOARD = NetworkTableInstance.getDefault().getTable("SmartDashboard");
 	protected List<Watchable> watchables;
 	protected Map<String, SimpleWatchable> flatWatchables;
 	private Optional<LogFile> log;
@@ -137,7 +138,7 @@ public class Watcher {
 	 * @param table
 	 *            to publish to
 	 */
-	protected void publish(ITable table) {
+	protected void publish(NetworkTable table) {
 		for (Entry<String, SimpleWatchable> info : flatWatchables.entrySet()) {
 			info.getValue().publishUnderName(info.getKey(), table);
 		}

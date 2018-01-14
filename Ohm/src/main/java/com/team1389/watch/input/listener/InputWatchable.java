@@ -5,7 +5,10 @@ import java.util.function.Supplier;
 
 import com.team1389.watch.info.NamedSimpleWatchable;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.TableEntryListener;
 
 /**
  * rather than <em>periodically</em> publishing itself, an inputWatchable publishes its default
@@ -43,21 +46,21 @@ public abstract class InputWatchable<T> extends NamedSimpleWatchable implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void publishUnderName(String name, ITable table) {
+	public void publishUnderName(String name, NetworkTable table) {
 		if (!table.containsKey(name)) {
 			put(table, name, val);
 
 		} else {
 			val = get(table, name, val);
 		}
-		table.addTableListener(name, (ITable t, String s, Object val, boolean changed) -> {
+		table.addEntryListener(name, (NetworkTable t, String s, NetworkTableEntry  entry,NetworkTableValue val, int flag) -> {
 			onChange.accept((T) val);
-		}, true);
+		}, TableEntryListener.kUpdate);
 	}
 
-	protected abstract void put(ITable table, String name, T val);
+	protected abstract void put(NetworkTable table, String name, T val);
 
-	protected abstract T get(ITable table, String name, T defaultVal);
+	protected abstract T get(NetworkTable table, String name, T defaultVal);
 
 	@Override
 	public String getPrintString() {

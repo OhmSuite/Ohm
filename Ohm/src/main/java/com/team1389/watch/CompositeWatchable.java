@@ -8,7 +8,7 @@ import java.util.Optional;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.info.SimpleWatchable;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * implements the <em>Composite Pattern</em>: <br>
@@ -40,7 +40,7 @@ public interface CompositeWatchable extends Watchable {
 	}
 	
 	@Override
-	default void publishUnderName(String name, ITable table) {
+	default void publishUnderName(String name, NetworkTable table) {
 		getSubWatchables(makeStem()).forEach(w -> w.publish(name, table));
 	}
 

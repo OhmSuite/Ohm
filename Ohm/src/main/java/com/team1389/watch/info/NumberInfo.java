@@ -2,7 +2,7 @@ package com.team1389.watch.info;
 
 import com.team1389.hardware.inputs.interfaces.ScalarInput;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * an info type that tracks a double
@@ -23,8 +23,8 @@ public class NumberInfo extends NamedSimpleWatchable {
 	}
 
 	@Override
-	public void publishUnderName(String name, ITable table) {
-		table.putNumber(name, source.get());
+	public void publishUnderName(String name, NetworkTable table) {
+		table.getEntry(name).setDouble(source.get());
 	}
 
 	@Override

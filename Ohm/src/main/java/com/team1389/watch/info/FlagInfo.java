@@ -2,7 +2,7 @@ package com.team1389.watch.info;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * a special boolean info that only displays if the boolean is true
@@ -20,7 +20,7 @@ public class FlagInfo extends BooleanInfo {
 	}
 
 	@Override
-	public void publishUnderName(String name, ITable table) {
+	public void publishUnderName(String name, NetworkTable table) {
 		if (in.getAsBoolean()) {
 			super.publishUnderName(name, table);
 		} else {

@@ -2,7 +2,7 @@ package com.team1389.watch.info;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * an info type that tracks the value of a string
@@ -24,8 +24,8 @@ public class StringInfo extends NamedSimpleWatchable {
 	}
 
 	@Override
-	public void publishUnderName(String name, ITable table) {
-		table.putString(name, source.get());
+	public void publishUnderName(String name, NetworkTable table) {
+		table.getEntry(name).setString(source.get());
 	}
 
 	@Override
