@@ -319,12 +319,17 @@ public class CANTalonHardware extends Hardware<CAN>
 		return wpiTalon.map(mapFunc);
 	}
 
+	private static void configFollowerMode(WPI_TalonSRX toFollow, WPI_TalonSRX wpiTalon)
+	{
+		wpiTalon.follow(toFollow);
+	}
+
 	public void follow(CANTalonHardware toFollow)
 	{
-		wpiTalon.ifPresent(t ->
+		if (toFollow.wpiTalon.isPresent())
 		{
-			t.follow(toFollow.wpiTalon.get());
-		});
+			wpiTalon.ifPresent(t -> configFollowerMode(toFollow.wpiTalon.get(), t));
+		}
 	}
 
 }
