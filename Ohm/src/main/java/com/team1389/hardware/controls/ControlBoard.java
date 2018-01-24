@@ -28,7 +28,7 @@ public class ControlBoard
 	}
 
 	private final LogitechExtreme3D driveController = new LogitechExtreme3D(0);
-	private final XBoxController manipController = new XBoxController(1); 
+	private final XBoxController manipController = new XBoxController(1);
 
 	public PercentIn driveYAxis()
 	{
@@ -89,16 +89,27 @@ public class ControlBoard
 	{
 		return manipController.leftStick.yAxis();
 	}
-	
-	public PercentIn leftStickXAxis() 
+
+	public PercentIn leftStickXAxis()
 	{
 		return manipController.leftStick.xAxis();
+	}
+
+	public PercentIn rightStickXAxis()
+	{
+		return manipController.rightStick.xAxis();
+	}
+
+	public PercentIn rightStickYAxis()
+	{
+		return manipController.rightStick.yAxis();
 	}
 
 	public DigitalIn rightBumper()
 	{
 		return manipController.rightBumper().latched();
 	}
+
 	public DigitalIn leftBumper()
 	{
 		return manipController.leftBumper().latched();
