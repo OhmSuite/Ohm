@@ -1,21 +1,25 @@
 package com.team1389.system.drive;
 
-public class CurvatureDriveAlgorithm {
+public class CurvatureDriveAlgorithm
+{
 	private double mQuickStopAccumulator;
 	private double kTurnSensitivity;
 
 	private double kSpinSensitivity;
 
-	public CurvatureDriveAlgorithm(double turnSensitivity, double spinSensitivity) {
+	public CurvatureDriveAlgorithm(double turnSensitivity, double spinSensitivity)
+	{
 		this.kTurnSensitivity = turnSensitivity;
 		this.kSpinSensitivity = spinSensitivity;
 	}
 
-	public void setCurveSensitivity(double kTurnSensitivity) {
+	public void setCurveSensitivity(double kTurnSensitivity)
+	{
 		this.kTurnSensitivity = kTurnSensitivity;
 	}
 
-	public void setSpinSensitivity(double kSpinSensitivity) {
+	public void setSpinSensitivity(double kSpinSensitivity)
+	{
 		this.kSpinSensitivity = kSpinSensitivity;
 	}
 
@@ -29,43 +33,54 @@ public class CurvatureDriveAlgorithm {
 	 *            whether the drivemode is tank drive
 	 * @return amount of voltage going to l/r motors, and the break mode
 	 */
-	public DriveSignal calculate(double throttle, double wheel, boolean isQuickTurn) {
+	public DriveSignal calculate(double throttle, double wheel, boolean isQuickTurn)
+	{
 
 		double overPower;
 
 		double angularPower;
 
-		if (isQuickTurn) {
-			if (Math.abs(throttle) < 0.2) {
+		if (isQuickTurn)
+		{
+			if (Math.abs(throttle) < 0.2)
+			{
 				double alpha = 0.1;
 				mQuickStopAccumulator = (1 - alpha) * mQuickStopAccumulator + alpha * wheel * 2;
 			}
 			overPower = 1.0;
 			angularPower = wheel * kSpinSensitivity;
-		} else {
+		} else
+		{
 			overPower = 0.0;
 			angularPower = Math.abs(throttle) * wheel * kTurnSensitivity - mQuickStopAccumulator;
-			if (mQuickStopAccumulator > 1) {
+			if (mQuickStopAccumulator > 1)
+			{
 				mQuickStopAccumulator -= 1;
-			} else if (mQuickStopAccumulator < -1) {
+			} else if (mQuickStopAccumulator < -1)
+			{
 				mQuickStopAccumulator += 1;
-			} else {
+			} else
+			{
 				mQuickStopAccumulator = 0.0;
 			}
 		}
 
 		double rightPwm = throttle - angularPower;
 		double leftPwm = throttle + angularPower;
-		if (leftPwm > 1.0) {
+		if (leftPwm > 1.0)
+		{
 			rightPwm -= overPower * (leftPwm - 1.0);
 			leftPwm = 1.0;
-		} else if (rightPwm > 1.0) {
+		} else if (rightPwm > 1.0)
+		{
 			leftPwm -= overPower * (rightPwm - 1.0);
 			rightPwm = 1.0;
-		} else if (leftPwm < -1.0) {
+		} else if (leftPwm < -1.0)
+		{
 			rightPwm += overPower * (-1.0 - leftPwm);
 			leftPwm = -1.0;
-		} else if (rightPwm < -1.0) {
+		} else if (rightPwm < -1.0)
+		{
 			leftPwm += overPower * (-1.0 - rightPwm);
 			rightPwm = -1.0;
 		}
