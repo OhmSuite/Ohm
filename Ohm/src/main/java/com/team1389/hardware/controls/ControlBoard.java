@@ -29,7 +29,7 @@ public class ControlBoard
 
 	private final LogitechExtreme3D driveController = new LogitechExtreme3D(0);
 	private final XBoxController manipController = new XBoxController(1);
-
+	private final XBoxController xDriveController = new XBoxController(2);
 	public PercentIn driveYAxis()
 	{
 		return driveController.yAxis().applyDeadband(.075).invert();
@@ -58,6 +58,18 @@ public class ControlBoard
 	public DigitalIn driveModifierBtn()
 	{
 		return driveController.trigger();
+	}
+	public PercentIn xDriveY()
+	{
+		return xDriveController.leftStick.yAxis().invert();
+	}
+	public PercentIn xDriveX()
+	{
+		return xDriveController.rightStick.xAxis();
+	}
+	public DigitalIn xDriveBtn()
+	{
+		return new DigitalIn(()-> xDriveController.rightTrigger().get()>60);
 	}
 
 	public DigitalIn aButton()
