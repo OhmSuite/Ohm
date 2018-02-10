@@ -1,8 +1,11 @@
 package com.team1389.system.drive;
 
+import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
+import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
+import com.team1389.hardware.value_types.Position;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
@@ -19,6 +22,8 @@ public class CurvatureDriveSystem extends DriveSystem
 	private PercentIn wheel;
 	private DigitalIn quickTurnButton;
 	public CurvatureDriveAlgorithm calc;
+	public AngleIn angle;
+	public double kP;
 
 	private DriveSignal mSignal = DriveSignal.NEUTRAL;
 
@@ -33,9 +38,12 @@ public class CurvatureDriveSystem extends DriveSystem
 	 * @param quickTurnButton
 	 *            switching from curvature drive, to tank drive
 	 */
-	public CurvatureDriveSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton)
+	public CurvatureDriveSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
+			AngleIn angle, double kP)
 	{
 		this(drive, throttle, wheel, quickTurnButton, 1.0, 1.0);
+		this.angle = angle;
+		this.kP = kP;
 	}
 
 	/**
@@ -76,8 +84,18 @@ public class CurvatureDriveSystem extends DriveSystem
 	@Override
 	public void update()
 	{
-		mSignal = calc.calculate(throttle.get(), wheel.get(), quickTurnButton.get());
-		drive.set(mSignal);
+		if ((wheel.get() < .1) && (wheel.get() > -.1))
+		{
+			drive.left().set(throttle.get() + (angle.get() * kP));
+			drive.right().set(throttle.get() - (angle.get() * kP));
+			System.out.println("angle " + angle.get());
+		} else
+		{
+
+			mSignal = calc.calculate(throttle.get(), wheel.get(), quickTurnButton.get());
+			drive.set(mSignal);
+		}
+
 	}
 
 	/**
