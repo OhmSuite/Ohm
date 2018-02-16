@@ -24,6 +24,7 @@ public class CurvatureDriveSystem extends DriveSystem
 	public CurvatureDriveAlgorithm calc;
 	public AngleIn angle;
 	public double kP;
+	DigitalIn driveStraight;
 
 	private DriveSignal mSignal = DriveSignal.NEUTRAL;
 
@@ -39,11 +40,12 @@ public class CurvatureDriveSystem extends DriveSystem
 	 *            switching from curvature drive, to tank drive
 	 */
 	public CurvatureDriveSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
-			AngleIn angle, double kP)
+			AngleIn angle, double kP, DigitalIn driveStraight)
 	{
 		this(drive, throttle, wheel, quickTurnButton, 1.0, 1.0);
 		this.angle = angle;
 		this.kP = kP;
+		this.driveStraight = driveStraight;
 	}
 
 	/**
@@ -84,11 +86,10 @@ public class CurvatureDriveSystem extends DriveSystem
 	@Override
 	public void update()
 	{
-		if ((wheel.get() < .1) && (wheel.get() > -.1))
+		if (driveStraight.get())
 		{
 			drive.left().set(throttle.get() + (angle.get() * kP));
 			drive.right().set(throttle.get() - (angle.get() * kP));
-			System.out.println("angle " + angle.get());
 		} else
 		{
 
