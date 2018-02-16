@@ -1,19 +1,23 @@
 package com.team1389.system.drive;
 
+import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
-public class CurvatureDriveSystem extends DriveSystem
+
+public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 {
 	private DriveOut<Percent> drive;
 	private PercentIn throttle;
 	private PercentIn wheel;
 	private DigitalIn quickTurnButton;
 	public CurvatureDriveAlgorithm calc;
-
+	public AngleIn angle;
+	public double kP;
+	public DigitalIn driveStraight;
 	private DriveSignal mSignal = DriveSignal.NEUTRAL;
 
 	/**
@@ -27,10 +31,13 @@ public class CurvatureDriveSystem extends DriveSystem
 	 * @param quickTurnButton
 	 *            switching from curvature drive, to tank drive
 	 */
-	public CurvatureDriveSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton)
+	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
+			AngleIn angle, double kP, DigitalIn driveStraight)
 	{
-		this(drive, throttle, wheel, quickTurnButton, 1.0, 1.0);
-
+		super(drive, throttle, wheel, quickTurnButton, 1.0, 1.0);
+		this.angle = angle;
+		this.kP = kP;
+		this.driveStraight = driveStraight;
 	}
 
 	/**
@@ -46,14 +53,14 @@ public class CurvatureDriveSystem extends DriveSystem
 	 * @param turnSensitivity
 	 *            severity of turn
 	 */
-	public CurvatureDriveSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
-			double turnSensitivity, double spinSensitivity)
+	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
+			double turnSensitivity, double spinSensitivity, AngleIn angle, double kP, DigitalIn driveStraight)
 	{
-		this.drive = drive;
-		this.throttle = throttle;
-		this.wheel = wheel;
-		this.quickTurnButton = quickTurnButton;
-		calc = new CurvatureDriveAlgorithm(turnSensitivity, spinSensitivity);
+		super(drive, throttle, wheel, quickTurnButton, turnSensitivity, spinSensitivity);
+		this.kP = kP;
+		this.angle = angle;
+		this.driveStraight = driveStraight;
+
 	}
 
 	/**
@@ -71,9 +78,16 @@ public class CurvatureDriveSystem extends DriveSystem
 	@Override
 	public void update()
 	{
+		if (driveStraight.get())
+		{
+			drive.left().set(throttle.get() + (angle.get() * kP));
+			drive.right().set(throttle.get() - (angle.get() * kP));
+		} else
+		{
 
-		mSignal = calc.calculate(throttle.get(), wheel.get(), quickTurnButton.get());
-		drive.set(mSignal);
+			mSignal = calc.calculate(throttle.get(), wheel.get(), quickTurnButton.get());
+			drive.set(mSignal);
+		}
 
 	}
 
@@ -93,7 +107,7 @@ public class CurvatureDriveSystem extends DriveSystem
 	@Override
 	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem)
 	{
-		return stem.put(drive, quickTurnButton.getWatchable("quickTurnButton"));
+		return stem;
 	}
 
 }

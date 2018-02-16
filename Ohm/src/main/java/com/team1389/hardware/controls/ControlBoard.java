@@ -76,6 +76,11 @@ public class ControlBoard
 		return new DigitalIn(() -> xDriveController.rightTrigger().get() > 60);
 
 	}
+	
+	public DigitalIn xDriveStraightButton()
+	{
+		return xDriveController.leftBumper().latched();
+	}
 
 	public DigitalIn aButton()
 	{
@@ -162,8 +167,5 @@ public class ControlBoard
 		return manipController.startButton().latched();
 	}
 
-	public DigitalIn driveStraightButton()
-	{
-		return xDriveController.leftBumper().latched();
-	}
+
 }
