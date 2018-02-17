@@ -8,9 +8,9 @@ import com.team1389.watch.Watchable;
 
 public class CurvatureDriveSystem extends DriveSystem
 {
-	private DriveOut<Percent> drive;
-	private PercentIn throttle;
-	private PercentIn wheel;
+	protected DriveOut<Percent> drive;
+	protected PercentIn throttle;
+	protected PercentIn wheel;
 	private DigitalIn quickTurnButton;
 	public CurvatureDriveAlgorithm calc;
 

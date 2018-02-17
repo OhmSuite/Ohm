@@ -11,13 +11,11 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 {
 	private DriveOut<Percent> drive;
 	private PercentIn throttle;
-	private PercentIn wheel;
 	private DigitalIn quickTurnButton;
 	public CurvatureDriveAlgorithm calc;
-	public AngleIn angle;
 	public double kP;
 	public DigitalIn driveStraight;
-	private DriveSignal mSignal = DriveSignal.NEUTRAL;
+	private AngleIn angle;
 
 	/**
 	 * 
@@ -81,8 +79,8 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 
 		if (driveStraight.get())
 		{
-			drive.left().set(throttle.get() + (angle.get() * kP));
-			drive.right().set(throttle.get() - (angle.get() * kP));
+			super.drive.left().set(super.throttle.get() + (angle.get() * kP));
+			super.drive.right().set(super.throttle.get() - (angle.get() * kP));
 		} else
 		{
 
