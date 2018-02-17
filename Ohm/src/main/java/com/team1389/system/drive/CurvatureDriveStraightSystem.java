@@ -7,7 +7,6 @@ import com.team1389.hardware.value_types.Percent;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
-
 public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 {
 	private DriveOut<Percent> drive;
@@ -31,8 +30,8 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	 * @param quickTurnButton
 	 *            switching from curvature drive, to tank drive
 	 */
-	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
-			AngleIn angle, double kP, DigitalIn driveStraight)
+	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel,
+			DigitalIn quickTurnButton, AngleIn angle, double kP, DigitalIn driveStraight)
 	{
 		super(drive, throttle, wheel, quickTurnButton, 1.0, 1.0);
 		this.angle = angle;
@@ -53,8 +52,9 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	 * @param turnSensitivity
 	 *            severity of turn
 	 */
-	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel, DigitalIn quickTurnButton,
-			double turnSensitivity, double spinSensitivity, AngleIn angle, double kP, DigitalIn driveStraight)
+	public CurvatureDriveStraightSystem(DriveOut<Percent> drive, PercentIn throttle, PercentIn wheel,
+			DigitalIn quickTurnButton, double turnSensitivity, double spinSensitivity, AngleIn angle, double kP,
+			DigitalIn driveStraight)
 	{
 		super(drive, throttle, wheel, quickTurnButton, turnSensitivity, spinSensitivity);
 		this.kP = kP;
@@ -72,12 +72,13 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	}
 
 	/**
-	 * expects to be called every tic, updates values of throttle, wheel,
+	 * expects to be called every tick, updates values of throttle, wheel,
 	 * quickTurnButton, and brakemode
 	 */
 	@Override
 	public void update()
 	{
+
 		if (driveStraight.get())
 		{
 			drive.left().set(throttle.get() + (angle.get() * kP));
@@ -85,8 +86,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 		} else
 		{
 
-			mSignal = calc.calculate(throttle.get(), wheel.get(), quickTurnButton.get());
-			drive.set(mSignal);
+			super.update();
 		}
 
 	}
@@ -107,7 +107,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	@Override
 	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem)
 	{
-		return stem;
+		return stem.put(drive, quickTurnButton.getWatchable("quickTurnButton"));
 	}
 
 }

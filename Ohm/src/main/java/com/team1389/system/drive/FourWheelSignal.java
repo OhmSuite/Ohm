@@ -15,6 +15,7 @@ public class FourWheelSignal {
 		this.topLeft = topLeft;
 		this.topRight = topRight;
 	}
+	
 
 	public DriveSignal getBottomWheels() {
 		return new DriveSignal(bottomLeft, bottomRight);
