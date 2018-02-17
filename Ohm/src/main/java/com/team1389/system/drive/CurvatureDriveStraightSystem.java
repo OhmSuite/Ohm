@@ -16,7 +16,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	public double kP;
 	public DigitalIn driveStraight;
 	private AngleIn angle;
-
+	private double prevAngle;
 	/**
 	 * 
 	 * @param drive
@@ -67,6 +67,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	@Override
 	public void init()
 	{
+		prevAngle=0;
 	}
 
 	/**
@@ -79,13 +80,15 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 
 		if (driveStraight.get())
 		{
-			super.drive.left().set(super.throttle.get() + (angle.get() * kP));
-			super.drive.right().set(super.throttle.get() - (angle.get() * kP));
+			super.drive.left().set(super.throttle.get() + ((prevAngle - angle.get()) * kP));
+			super.drive.right().set(super.throttle.get() - ((prevAngle - angle.get()) * kP));
+			
 		} else
 		{
 
 			super.update();
 		}
+		prevAngle = angle.get();
 
 	}
 

@@ -78,7 +78,7 @@ public class ControlBoard
 	
 	public DigitalIn xDriveStraightButton()
 	{
-		return xDriveController.leftBumper().latched();
+		return xDriveController.leftBumper();
 	}
 
 	public DigitalIn aButton()
