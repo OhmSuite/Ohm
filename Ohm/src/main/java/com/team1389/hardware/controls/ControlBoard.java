@@ -146,6 +146,16 @@ public class ControlBoard
 	{
 		return manipController.downArrow().latched();
 	}
+	
+	public DigitalIn leftDPad()
+	{
+		return manipController.leftArrow().latched();
+	}
+	
+	public DigitalIn rightDPad()
+	{
+		return manipController.rightArrow().latched();
+	}
 
 	public DigitalIn backButton()
 	{
