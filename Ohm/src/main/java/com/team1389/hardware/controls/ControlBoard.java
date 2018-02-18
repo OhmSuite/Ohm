@@ -73,13 +73,12 @@ public class ControlBoard
 
 	public DigitalIn xDriveBtn()
 	{
-		return new DigitalIn(() -> xDriveController.rightTrigger().get() > 60);
-
+		return xDriveController.rightBumper();
 	}
 	
 	public DigitalIn xDriveStraightButton()
 	{
-		return xDriveController.leftBumper().latched();
+		return xDriveController.leftBumper();
 	}
 
 	public DigitalIn aButton()
