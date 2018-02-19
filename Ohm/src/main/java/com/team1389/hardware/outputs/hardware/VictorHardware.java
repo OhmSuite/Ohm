@@ -35,13 +35,13 @@ public class VictorHardware extends Hardware<PWM> {
 	/**
 	 * @return a voltage output stream for this victor
 	 */
-	public PercentOut getVoltageOutput() {
+	public PercentOut getVoltageController() {
 		return new PercentOut(pos -> wpiVictor.ifPresent(s -> s.set(pos)));
 	}
 
 	@Override
 	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem) {
-		return super.getSubWatchables(stem).put(getVoltageOutput().getWatchable("voltage"));
+		return super.getSubWatchables(stem).put(getVoltageController().getWatchable("voltage"));
 	}
 
 	@Override
