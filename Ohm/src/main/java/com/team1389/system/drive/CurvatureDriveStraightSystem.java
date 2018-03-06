@@ -35,6 +35,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 		this.angle = angle;
 		this.kP = kP;
 		this.driveStraight = driveStraight;
+		this.drive = drive;
 	}
 
 	/**
