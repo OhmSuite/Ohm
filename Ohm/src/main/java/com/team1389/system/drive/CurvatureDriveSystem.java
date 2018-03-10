@@ -11,7 +11,7 @@ public class CurvatureDriveSystem extends DriveSystem
 	protected DriveOut<Percent> drive;
 	protected PercentIn throttle;
 	protected PercentIn wheel;
-	private DigitalIn quickTurnButton;
+	protected DigitalIn quickTurnButton;
 	public CurvatureDriveAlgorithm calc;
 
 	private DriveSignal mSignal = DriveSignal.NEUTRAL;
