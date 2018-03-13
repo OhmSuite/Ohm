@@ -309,6 +309,25 @@ public class CANTalonHardware extends Hardware<CAN>
 		}));
 	}
 
+	/**
+	 * sets hard limit on current, ignores checking for peak current before
+	 * activating current limit
+	 * 
+	 * @param talon 
+	 * @param limit the current limit in amps
+	 */
+	private static void configMaxCurrent(WPI_TalonSRX talon, int limit)
+	{
+		talon.configPeakCurrentLimit(0, kTimeoutMs);
+		talon.configPeakCurrentDuration(0, kTimeoutMs);
+		talon.configContinuousCurrentLimit(limit, kTimeoutMs);
+		talon.enableCurrentLimit(true);
+	}
+	public void setMaxCurrent(int limit)
+	{
+		wpiTalon.ifPresent((t) -> configMaxCurrent(t, limit));
+	}
+
 	public void ifPresent(Consumer<WPI_TalonSRX> doIfPresent)
 	{
 		wpiTalon.ifPresent(doIfPresent);
