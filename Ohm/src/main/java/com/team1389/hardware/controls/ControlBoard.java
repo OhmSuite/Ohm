@@ -61,7 +61,7 @@ public class ControlBoard
 		return driveController.trigger();
 	}
 
-	public PercentIn xDriveY()
+	public PercentIn xLeftDriveY()
 	{
 		return xDriveController.leftStick.yAxis().invert();
 	}
@@ -69,6 +69,10 @@ public class ControlBoard
 	public PercentIn xDriveX()
 	{
 		return xDriveController.rightStick.xAxis();
+	}
+	public PercentIn xRightDriveY()
+	{
+		return xDriveController.rightStick.yAxis().invert();
 	}
 
 	public DigitalIn xDriveBtn()
@@ -128,12 +132,12 @@ public class ControlBoard
 
 	public DigitalIn rightBumper()
 	{
-		return manipController.rightBumper().latched();
+		return manipController.rightBumper();
 	}
 
 	public DigitalIn leftBumper()
 	{
-		return manipController.leftBumper().latched();
+		return manipController.leftBumper();
 	}
 
 	public DigitalOut setRumble()

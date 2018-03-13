@@ -318,8 +318,8 @@ public class CANTalonHardware extends Hardware<CAN>
 	 */
 	private static void configMaxCurrent(WPI_TalonSRX talon, int limit)
 	{
-		talon.configPeakCurrentLimit(0, kTimeoutMs);
-		talon.configPeakCurrentDuration(0, kTimeoutMs);
+		talon.configPeakCurrentLimit(30, kTimeoutMs);
+		talon.configPeakCurrentDuration(100, kTimeoutMs);
 		talon.configContinuousCurrentLimit(limit, kTimeoutMs);
 		talon.enableCurrentLimit(true);
 	}
