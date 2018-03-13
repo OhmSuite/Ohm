@@ -108,7 +108,7 @@ public class CurvatureDriveStraightSystem extends CurvatureDriveSystem
 	@Override
 	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem)
 	{
-		return stem.put(drive, quickTurnButton.getWatchable("quickTurnButton"));
+		return stem.put(super.drive, super.quickTurnButton.getWatchable("quickTurnButton"));
 	}
 
 }
