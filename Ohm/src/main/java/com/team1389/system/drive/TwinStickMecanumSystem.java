@@ -44,6 +44,55 @@ public class TwinStickMecanumSystem extends Subsystem {
 
 	}
 
+	public void setPowerAlg2(double leftStickY, double leftStickX, double rightStickX, FourDriveOut<Percent> drive) {
+		double leftF, leftB, rightF, rightB; // front & back, left & right
+		leftF = leftStickY;
+		rightF = leftStickY;
+		leftB = leftStickY;
+		rightB = leftStickY;
+
+		leftF += leftStickX;
+		rightF += -leftStickX;
+		leftB += -leftStickX;
+		rightB += leftStickX;
+
+		leftF += rightStickX;
+		rightF += -rightStickX;
+		leftB += rightStickX;
+		rightB += -rightStickX;
+
+		double max = Math.max(Math.max(Math.abs(leftF), Math.abs(rightF)), Math.max(Math.abs(leftB), Math.abs(rightB)));
+
+		if (max > 1) {
+			leftF = leftF / max;
+			rightF = rightF / max;
+			leftB = leftB / max;
+			rightB = rightB / max;
+		}
+		drive.set(new FourWheelSignal(leftF, rightF, leftB, rightB));
+	}
+
+	public void setPowerAlg3(double leftStickY, double leftStickX, double rightStickX, FourDriveOut<Percent> drive) {
+		double leftF, leftB, rightF, rightB; // front & back, left & right
+		double r = Math.hypot(leftStickX, leftStickY);
+		double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
+		leftF = r * Math.cos(robotAngle) + rightStickX;
+		rightF = r * Math.sin(robotAngle) - rightStickX;
+		leftB = r * Math.sin(robotAngle) + rightStickX;
+		rightB = r * Math.cos(robotAngle) - rightStickX;
+
+		double max = Math.max(Math.max(Math.abs(leftF), Math.abs(rightF)), Math.max(Math.abs(leftB), Math.abs(rightB)));
+
+		if (max > 1) {
+			leftF = leftF / max;
+			rightF = rightF / max;
+			leftB = leftB / max;
+			rightB = rightB / max;
+		}
+
+		drive.set(new FourWheelSignal(leftF, rightF, leftB, rightB));
+	}
+
 	public TwinStickMecanumSystem(PercentIn leftStickY, PercentIn rightStickX, FourDriveOut<Percent> drive) {
 		this.leftStickY = leftStickY;
 		this.rightStickX = rightStickX;
