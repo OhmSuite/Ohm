@@ -10,32 +10,49 @@ import com.team1389.watch.Watchable;
  * Mecanum Drive System for controller with two sticks. Still Untested.
  */
 public class TwinStickMecanumSystem extends Subsystem {
-	PercentIn leftStickY, leftStickX;
+	PercentIn leftStickY;
 	PercentIn rightStickX;
 	FourDriveOut<Percent> drive;
 
-	private void setPower(double leftStickX, double leftStickY, double rightStickX, FourDriveOut<Percent> drive) {
-		double r = Math.hypot(leftStickX, leftStickY);
-		double robotAngle = Math.atan2(leftStickY, leftStickX) - Math.PI / 4;
-		final double leftFront = r * Math.cos(robotAngle) + rightStickX;
-		final double rightFront = r * Math.sin(robotAngle) - rightStickX;
-		final double leftRear = r * Math.sin(robotAngle) + rightStickX;
-		final double rightRear = r * Math.cos(robotAngle) - rightStickX;
-		drive.set(new FourWheelSignal(leftFront, rightFront, leftRear, rightRear));
+	// new alg is untested
+	private void setPower(double leftStickY, double rightStickX, FourDriveOut<Percent> drive) {
+		double forward = -leftStickY; // push joystick forward to go forward
+		double right = rightStickX; // push joystick to the right to strafe right
+		// tentative hack to get twist. Not sure if forward should be negative.
+		double clockwise = Math.hypot(forward, right);
+
+		double frontLeft = forward + clockwise + right;
+		double frontRight = forward - clockwise - right;
+		double rearLeft = forward + clockwise - right;
+		double rearRight = forward - clockwise + right;
+		// Finally, normalize the wheel speed commands
+		// so that no wheel speed command exceeds magnitude of 1:
+		double max = Math.abs(frontLeft);
+		if (Math.abs(frontRight) > max)
+			max = Math.abs(frontRight);
+		if (Math.abs(rearLeft) > max)
+			max = Math.abs(rearLeft);
+		if (Math.abs(rearRight) > max)
+			max = Math.abs(rearRight);
+		if (max > 1) {
+			frontLeft /= max;
+			frontRight /= max;
+			rearLeft /= max;
+			rearRight /= max;
+		}
+		drive.set(new FourWheelSignal(frontLeft, frontRight, rearLeft, rearRight));
+
 	}
 
-	public TwinStickMecanumSystem(PercentIn leftStickY, PercentIn leftStickX, PercentIn rightStickX,
-			FourDriveOut<Percent> drive) {
+	public TwinStickMecanumSystem(PercentIn leftStickY, PercentIn rightStickX, FourDriveOut<Percent> drive) {
 		this.leftStickY = leftStickY;
-		this.leftStickX = leftStickX;
 		this.rightStickX = rightStickX;
 		this.drive = drive;
 	}
 
 	@Override
 	public AddList<Watchable> getSubWatchables(AddList<Watchable> stem) {
-		return stem.put(leftStickY.getWatchable("left stick y"), leftStickX.getWatchable("left stick x"),
-				rightStickX.getWatchable("rightStickX"), drive);
+		return stem.put(leftStickY.getWatchable("left stick y"), rightStickX.getWatchable("rightStickX"), drive);
 	}
 
 	@Override
@@ -50,7 +67,7 @@ public class TwinStickMecanumSystem extends Subsystem {
 
 	@Override
 	public void update() {
-		setPower(leftStickX.get(), leftStickY.get(), rightStickX.get(), drive);
+		setPower(leftStickY.get(), rightStickX.get(), drive);
 	}
 
 }

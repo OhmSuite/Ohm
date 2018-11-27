@@ -6,6 +6,7 @@ public class MecanumAlgorithm {
 		double forward = -yThrottle; // push joystick forward to go forward
 		double right = xThrottle; // push joystick to the right to strafe right
 		double clockwise = twist;
+
 		if (fieldOriented) {
 			System.out.println("Mecanum Drive System: field oriented");
 			double temp = forward * Math.cos(theta) + right * Math.sin(theta);
